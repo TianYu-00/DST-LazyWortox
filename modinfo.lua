@@ -54,7 +54,7 @@ server_filter_tags = {
 }
 
 -- Key Options
--- ..\SteamLibrary\steamapps\common\Don't Starve Together\data\databundles\scripts\scripts\constants.lua
+-- ..\SteamLibrary\steamapps\common\Don't Starve Together\data\databundles\scripts.zip\scripts\constants.lua
 local key_options = {}
 local keys = {
     "None",
@@ -136,6 +136,13 @@ configuration_options = {
         options = key_options,
         default = "B"
     },
+    {
+        name = "Put_Soul_In_Jar_Key",
+        label = not isCN and "Put Soul In Jar Key" or "罐子放魂按键",
+        hover = not isCN and "" or "",
+        options = key_options,
+        default = "G"
+    },
     AddSection("Advanced Settings","高级设置"),
     {
         name = "Amount_Of_Souls_To_Take",
@@ -176,6 +183,16 @@ configuration_options = {
                         "取出灵魂后，切换到下一个罐子前等待的帧数。\n确保上一次转移顺利完成。",
         options = frame_options,
         default = 2
+    },
+    {
+        name = "Frames_Put_Soul_In_Jar_Delay",
+        label = not isCN and "Put Soul Delay (frames)" or "放灵魂延迟（帧数）",
+        hover = not isCN and 
+                        "Frames to wait before putting soul in jar again.\nHigher may reduce glitches."
+                        or
+                        "再次放灵魂进罐前等待的帧数，数值越大可能减少异常。",
+        options = frame_options,
+        default = 3
     },
     {
         name = "Debug_Mode",

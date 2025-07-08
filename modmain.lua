@@ -5,9 +5,11 @@ local soul_drop_key = GetModConfigData("Soul_Drop_Key") or "R"
 local open_soul_jar_key = GetModConfigData("Open_Soul_Jar_Key") or "C"
 local self_leap_key = GetModConfigData("Self_Leap_Key") or "V"
 local take_soul_from_jar_key = GetModConfigData("Take_Soul_From_Jar_Key") or "B"
+local put_soul_in_jar_key = GetModConfigData("Put_Soul_In_Jar_Key") or "G"
 local amount_of_souls_to_take = GetModConfigData("Amount_Of_Souls_To_Take") or 5
 local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
 local frames_to_wait_for_ui = GetModConfigData("Frames_To_Wait_For_UI") or 6
+local frames_put_soul_in_jar_delay = GetModConfigData("Frames_Put_Soul_In_Jar_Delay") or 3
 local frames_to_move_to_next_jar = GetModConfigData("Frames_To_Move_To_Next_Jar") or 1
 
 
@@ -87,6 +89,68 @@ local function GetCurrentSoulCount()
     end
     return count
 end
+
+
+---- Soul Helper Functions
+
+-- All soul data
+local function GetAllSoulData()
+    local player = G.ThePlayer
+    local souls = {}
+    for slot_index, item in pairs(player.replica.inventory:GetItems()) do
+        if item and item.prefab == "wortox_soul" then
+            table.insert(souls, {
+                item = item,
+                index = slot_index
+            })
+        end
+    end
+    return souls
+end
+
+
+
+
+---- Jar Helper Functions
+
+-- All jars data
+local function GetAllJarsData()
+    local player = G.ThePlayer
+    local jars = {}
+    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
+        if item and item.prefab == "wortox_souljar" then
+            table.insert(jars, {
+            item = item,
+            index = jar_index
+            })
+        end
+    end
+    return jars
+end
+
+-- All not full jars data
+local function GetAllNotFullJarsData()
+    local player = G.ThePlayer
+    local jars = {}
+    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
+        if item and item.prefab == "wortox_souljar" then
+            local used = item.replica._.inventoryitem.classified.percentused:value()
+            if used < 100 then
+                table.insert(jars, {
+                item = item,
+                index = jar_index
+                })
+            end
+        end
+    end
+    return jars
+end
+
+
+
+
+----------------------------------- NEEDS REFACTORING -----------------------------------
+-- Update this function to use newly added functions 
 
 -- Take souls from jars
 -- Hello future me or whoever is reading this, this function is a bit complex so i'll add more comments to help with understanding.
@@ -203,10 +267,84 @@ local function TakeSoulFromJar(total_to_take, retry_count)
     TryJar(1, total_to_take)
 end
 
+----------------------------------- END OF NEEDS REFACTORING ----------------------------------- 
+
+-- Put souls in jars
+-- Bit complex but ill explain later :)
+local function PutSoulInJar(total_to_put, on_repeat)
+    DebugLog("Function: PutSoulInJar() called")
+    if not CheckPlayerState() then return end
+
+    local player = G.ThePlayer
+    total_to_put = total_to_put or 5
+    on_repeat = on_repeat or false
+
+    if player.is_already_performing_put_soul then
+        DebugLog("Already putting souls, aborting new request.")
+        return
+    end
+
+    player.is_already_performing_put_soul = true
+
+    local active_item = player.replica.inventory:GetActiveItem()
+
+    local souls = GetAllSoulData()
+    local has_souls_in_hand = active_item and active_item.prefab == "wortox_soul" and active_item.replica.stackable:StackSize() > 0
+
+    if #souls == 0 and not has_souls_in_hand then
+        DebugLog("No souls to put.")
+        player.is_already_performing_put_soul = nil
+        return
+    end
+
+    local soul = souls[1]
+    if not soul or not soul.index then
+        if not has_souls_in_hand then
+            DebugLog("No valid soul for transfer.")
+            player.is_already_performing_put_soul = nil
+            return
+        end
+    end
+
+    local jars = GetAllNotFullJarsData()
+    if #jars == 0 then
+        DebugLog("No jars with space left.")
+        player.is_already_performing_put_soul = nil
+        G.SendRPCToServer(G.RPC.AddAllOfActiveItemToSlot, soul.index)
+        return
+    end
+    
+    if not on_repeat then
+        G.SendRPCToServer(G.RPC.TakeActiveItemFromCountOfSlot, soul.index, nil, total_to_put)
+    end
+
+    -- player.replica.inventory:UseItemFromInvTile(jars[1].item) -- This works too but it plays 2 animations, one for jar opening and one for soul placing. not efficient
+
+    G.SendRPCToServer(G.RPC.UseItemFromInvTile, G.ACTIONS.STORE.code, jars[1].item, nil, nil) -- Could cause stagger when movement speed is high while store action plays, but this way is faster and more efficient
+    
+    player:DoTaskInTime(6 * G.FRAMES, function()
+        local active_item = player.replica.inventory:GetActiveItem()
+        if active_item and active_item.prefab == "wortox_soul" then
+            local stack_size = active_item.replica.stackable:StackSize()
+            DebugLog("Active soul stack size: " .. tostring(stack_size))
+            if stack_size > 0 then
+                DebugLog("Still has soul in hand, repeating...")
+                player.is_already_performing_put_soul = nil
+                player:DoTaskInTime(frames_put_soul_in_jar_delay * G.FRAMES, function()
+                    PutSoulInJar(stack_size, true)
+                end)
+                return
+            end
+        end
+
+        DebugLog("No more active souls to place.")
+        player.is_already_performing_put_soul = nil
+    end)
+end
 
 
 
--------------------------------------------------------------------------------------------
+----------------------------------- FOR TESTING PURPOSES ONLY ----------------------------------- 
 
 -- For my testing purposes
 local function Test()
@@ -214,7 +352,10 @@ local function Test()
     print("TEST123")
 end
 
--------------------------------------------------------------------------------------------
+----------------------------------- END OF FOR TESTING PURPOSES ONLY ----------------------------------- 
+
+
+----------------------------------- KEY HANDLERS ----------------------------------- 
 
 -- Soul Drop Handler
 if soul_drop_key ~= "None" then
@@ -241,3 +382,13 @@ if take_soul_from_jar_key ~= "None" then
         TakeSoulFromJar(amount_of_souls_to_take)
     end)
 end
+
+-- Put Soul In Jar Handler
+if put_soul_in_jar_key ~= "None" then
+    local keycode = G["KEY_" .. put_soul_in_jar_key]
+    G.TheInput:AddKeyUpHandler(keycode, function()
+        PutSoulInJar(5)
+    end)
+end
+
+----------------------------------- END OF KEY HANDLERS ----------------------------------- 
