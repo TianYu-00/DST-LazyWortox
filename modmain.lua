@@ -223,19 +223,19 @@ if soul_drop_key ~= "None" then
 end
 
 -- Open Soul Jar Handler
-if soul_drop_key ~= "None" then
+if open_soul_jar_key ~= "None" then
     local keycode = G["KEY_" .. open_soul_jar_key]
     G.TheInput:AddKeyDownHandler(keycode, OpenSoulJar)
 end
 
 -- Self Leap Handler
-if soul_drop_key ~= "None" then
+if self_leap_key ~= "None" then
     local keycode = G["KEY_" .. self_leap_key]
     G.TheInput:AddKeyDownHandler(keycode, SelfLeap)
 end
 
 -- Take Soul From Jar Handler
-if soul_drop_key ~= "None" then
+if take_soul_from_jar_key ~= "None" then
     local keycode = G["KEY_" .. take_soul_from_jar_key]
     G.TheInput:AddKeyUpHandler(keycode, function()
         TakeSoulFromJar(amount_of_souls_to_take)
