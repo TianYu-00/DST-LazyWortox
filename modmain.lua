@@ -124,7 +124,7 @@ local function TakeSoulFromJar(total_to_take, retry_count)
         return
     end
 
-    local jar_capacity = TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
+    local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
     local max_ui_wait_retries = 20 -- Retry limit when waiting for UI ("doing" tag)
 
     -- Recursive function to process each jar
