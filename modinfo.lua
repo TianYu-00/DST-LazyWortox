@@ -184,7 +184,17 @@ configuration_options = {
         options = GenerateValueOptions(1, 60),
         default = 2
     },
-    AddSection("Souls To Put Settings","放魂设置"),
+    AddSection("Souls To Store Settings","存魂设置"),
+    {
+        name = "Amount_Of_Souls_To_Store",
+        label = not isCN and "Souls per Store" or "每次存魂数量",
+        hover = not isCN and 
+                        "How many souls to store each time you press the key." 
+                        or
+                        "每次按存魂键时要存入的灵魂数量。",
+        options = GenerateValueOptions(1, 20),
+        default = 5
+    },
     {
         name = "Soul_Hand_Check_Interval",
         label = not isCN and "Hand‑Check (sec)" or "手持检查间隔",
