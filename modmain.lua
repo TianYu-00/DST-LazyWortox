@@ -12,6 +12,8 @@ local frames_to_wait_for_ui = GetModConfigData("Frames_To_Wait_For_UI") or 6
 local decimal_put_soul_in_jar_delay = GetModConfigData("Decimal_Put_Soul_In_Jar_Delay") or 3
 local frames_to_move_to_next_jar = GetModConfigData("Frames_To_Move_To_Next_Jar") or 1
 
+local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
+
 
 -- Helper function to log debug messages
 local function DebugLog (msg)
@@ -146,12 +148,6 @@ local function GetAllNotFullJarsData()
     return jars
 end
 
-
-
-
------------------------------------ NEEDS REFACTORING -----------------------------------
--- Update this function to use newly added functions 
-
 -- Take souls from jars
 -- Hello future me or whoever is reading this, this function is a bit complex so i'll add more comments to help with understanding.
 local function TakeSoulFromJar(total_to_take, retry_count)
@@ -174,21 +170,14 @@ local function TakeSoulFromJar(total_to_take, retry_count)
     local before_count = GetCurrentSoulCount()
 
     -- Collect all soul jars from player's inventory
-    local jars = {}
-    for _, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_souljar" then
-            table.insert(jars, item)
-        end
-    end
+    local jars = GetAllJarsData()
 
-    -- Exit early if there are no jars or nothing to take
     if #jars == 0 or total_to_take <= 0 then
         DebugLog("No jars or nothing to take.")
         player.is_already_performing_take_soul = nil
         return
     end
 
-    local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
     local max_ui_wait_retries = 20 -- Retry limit when waiting for UI ("doing" tag)
 
     -- Recursive function to process each jar
@@ -217,7 +206,7 @@ local function TakeSoulFromJar(total_to_take, retry_count)
         end
 
         -- Select the current jar
-        local jar = jars[index]
+        local jar = jars[index].item
         -- Calculate current soul count in the jar based on its percent used
         local percent = jar.replica._.inventoryitem.classified.percentused:value()
         local in_jar = math.floor((percent / 100) * jar_capacity)
@@ -266,8 +255,6 @@ local function TakeSoulFromJar(total_to_take, retry_count)
     -- Start processing jars from the first one
     TryJar(1, total_to_take)
 end
-
------------------------------------ END OF NEEDS REFACTORING ----------------------------------- 
 
 -- Put souls in jars
 -- Bit complex but ill explain later :)
