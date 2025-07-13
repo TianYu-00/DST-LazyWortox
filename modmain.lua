@@ -13,7 +13,7 @@ local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
 local wait_for_ui_delay = GetModConfigData("Wait_For_UI_Delay") or 6
 local move_to_next_jar_delay = GetModConfigData("Move_To_Next_Jar_Delay") or 2
 -- Put soul settings
-local put_soul_in_jar_delay = GetModConfigData("Put_Soul_In_Jar_Delay") or 3
+local put_soul_in_jar_delay = GetModConfigData("Put_Soul_In_Jar_Delay") or 0.4
 -- Debud settings
 local debug_mode = GetModConfigData("Debug_Mode") or false
 
