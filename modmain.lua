@@ -1,17 +1,23 @@
 local G = GLOBAL
 
-local debug_mode = GetModConfigData("Debug_Mode") or false
+---- Mod config data
+-- Settings
 local soul_drop_key = GetModConfigData("Soul_Drop_Key") or "R"
 local open_soul_jar_key = GetModConfigData("Open_Soul_Jar_Key") or "C"
 local self_leap_key = GetModConfigData("Self_Leap_Key") or "V"
 local take_soul_from_jar_key = GetModConfigData("Take_Soul_From_Jar_Key") or "B"
 local put_soul_in_jar_key = GetModConfigData("Put_Soul_In_Jar_Key") or "G"
+-- Take soul settings
 local amount_of_souls_to_take = GetModConfigData("Amount_Of_Souls_To_Take") or 5
 local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
-local frames_to_wait_for_ui = GetModConfigData("Frames_To_Wait_For_UI") or 6
-local decimal_put_soul_in_jar_delay = GetModConfigData("Decimal_Put_Soul_In_Jar_Delay") or 3
-local frames_to_move_to_next_jar = GetModConfigData("Frames_To_Move_To_Next_Jar") or 1
+local wait_for_ui_delay = GetModConfigData("Wait_For_UI_Delay") or 6
+local move_to_next_jar_delay = GetModConfigData("Move_To_Next_Jar_Delay") or 2
+-- Put soul settings
+local put_soul_in_jar_delay = GetModConfigData("Put_Soul_In_Jar_Delay") or 3
+-- Debud settings
+local debug_mode = GetModConfigData("Debug_Mode") or false
 
+--
 local PREFAB_SOUL  = "wortox_soul"
 local PREFAB_JAR   = "wortox_souljar"
 local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
@@ -214,10 +220,10 @@ local function TakeSoulFromJar(total_to_take, retry_count)
             DebugLog("Function: WaitForOpen() called")
             if player:HasTag("doing") then
                 -- When UI is open, take souls from the jar
-                player:DoTaskInTime(frames_to_wait_for_ui * G.FRAMES, function()
+                player:DoTaskInTime(wait_for_ui_delay * G.FRAMES, function()
                     G.SendRPCToServer(G.RPC.MoveItemFromCountOfSlot, 1, jar, nil, take)
                     -- After taking souls, try the next jar
-                    player:DoTaskInTime(frames_to_move_to_next_jar * G.FRAMES, function()
+                    player:DoTaskInTime(move_to_next_jar_delay * G.FRAMES, function()
                         TryJar(index + 1, souls_left - take)
                     end)
                 end)
@@ -295,7 +301,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
 
     G.SendRPCToServer(G.RPC.UseItemFromInvTile, G.ACTIONS.STORE.code, jars[1].item, nil, nil) -- Could cause stagger when movement speed is high while store action plays, but this way is faster and more efficient
     
-    player:DoTaskInTime(decimal_put_soul_in_jar_delay, function()
+    player:DoTaskInTime(put_soul_in_jar_delay, function()
         local active_item = player.replica.inventory:GetActiveItem()
         if active_item and active_item.prefab == PREFAB_SOUL then
             local stack_size = GetStackSize(active_item)

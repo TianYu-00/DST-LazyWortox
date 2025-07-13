@@ -150,7 +150,7 @@ configuration_options = {
         default = 1
     },
     {
-        name = "Frames_To_Wait_For_UI",
+        name = "Wait_For_UI_Delay",
         label = not isCN and "Frames to Wait for UI" or "等待UI打开的帧数",
         hover = not isCN and 
                         "Number of frames to wait after opening the jar UI before taking souls.\nToo low may cause errors if the UI isn’t ready yet." 
@@ -160,7 +160,7 @@ configuration_options = {
         default = 6
     },
     {
-        name = "Frames_To_Move_To_Next_Jar",
+        name = "Move_To_Next_Jar_Delay",
         label = not isCN and "Frames Before Moving to Next Jar" or "切换到下一个罐子前等待的帧数",
         hover = not isCN and 
                         "Number of frames to wait after taking souls before attempting the next jar.\nHelps ensure the previous transfer completes smoothly."
@@ -171,7 +171,7 @@ configuration_options = {
     },
     AddSection("Souls To Put Settings","放魂设置"),
     {
-        name = "Decimal_Put_Soul_In_Jar_Delay",
+        name = "Put_Soul_In_Jar_Delay",
         label = not isCN and "Put Soul Delay (Seconds)" or "放灵魂延迟（秒数）",
         hover = not isCN and 
                         ""
