@@ -9,7 +9,7 @@ local put_soul_in_jar_key = GetModConfigData("Put_Soul_In_Jar_Key") or "G"
 local amount_of_souls_to_take = GetModConfigData("Amount_Of_Souls_To_Take") or 5
 local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
 local frames_to_wait_for_ui = GetModConfigData("Frames_To_Wait_For_UI") or 6
-local frames_put_soul_in_jar_delay = GetModConfigData("Frames_Put_Soul_In_Jar_Delay") or 3
+local decimal_put_soul_in_jar_delay = GetModConfigData("Decimal_Put_Soul_In_Jar_Delay") or 3
 local frames_to_move_to_next_jar = GetModConfigData("Frames_To_Move_To_Next_Jar") or 1
 
 
@@ -323,7 +323,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
 
     G.SendRPCToServer(G.RPC.UseItemFromInvTile, G.ACTIONS.STORE.code, jars[1].item, nil, nil) -- Could cause stagger when movement speed is high while store action plays, but this way is faster and more efficient
     
-    player:DoTaskInTime(0.4, function()
+    player:DoTaskInTime(decimal_put_soul_in_jar_delay, function()
         local active_item = player.replica.inventory:GetActiveItem()
         if active_item and active_item.prefab == "wortox_soul" then
             local stack_size = (active_item.replica.stackable and active_item.replica.stackable:StackSize()) or 0

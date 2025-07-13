@@ -94,6 +94,16 @@ for i = 1, #frames do
     frame_options[i] = {description = frames[i], data = frames[i]}
 end
 
+-- Decimal Options
+local decimal_options = {}
+local decimals = {
+    0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1
+}
+
+for i = 1, #decimals do
+    decimal_options[i] = {description = decimals[i], data = decimals[i]}
+end
+
 -- Mod Config Helper
 local function AddSection(lang_en, lang_cn)
     local tempName = "temp_"..lang_en:gsub("%s+", "_"):lower()
@@ -185,14 +195,14 @@ configuration_options = {
         default = 2
     },
     {
-        name = "Frames_Put_Soul_In_Jar_Delay",
-        label = not isCN and "Put Soul Delay (frames)" or "放灵魂延迟（帧数）",
+        name = "Decimal_Put_Soul_In_Jar_Delay",
+        label = not isCN and "Put Soul Delay (Seconds)" or "放灵魂延迟（秒数）",
         hover = not isCN and 
-                        "Frames to wait before putting soul in jar again.\nHigher may reduce glitches."
+                        ""
                         or
-                        "再次放灵魂进罐前等待的帧数，数值越大可能减少异常。",
-        options = frame_options,
-        default = 3
+                        "",
+        options = decimal_options,
+        default = 0.4
     },
     {
         name = "Debug_Mode",
