@@ -24,26 +24,30 @@ local PREFAB_JAR   = "wortox_souljar"
 local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
 
 
--- Helper function to log debug messages
+----------------------------------- Debug Log ----------------------------------- 
+
 local function DebugLog (msg)
     if not debug_mode then return end
     print("[Lazy Wortox] " .. msg)
 end
 
--- Stack size validator function to validate the stackable item
+----------------------------------- Get Stack Size ----------------------------------- 
+
 local function GetStackSize(item)
     return (item and item.replica.stackable and item.replica.stackable:StackSize()) or 0
 end
 
 
--- Check if the player is Wortox and is in game but also not input focused (typing in search bar or chat etc)
+----------------------------------- Check Player State ----------------------------------- 
+
 local function CheckPlayerState()
     DebugLog("Function: CheckPlayerState() called")
     local player = G.ThePlayer
     return player ~= nil and player.prefab == "wortox" and player.HUD and not player.HUD:HasInputFocus()
 end
 
--- Drop soul function
+----------------------------------- Drop Soul ----------------------------------- 
+
 local function DropSoul()
     DebugLog("Function: DropSoul() called")
     if not CheckPlayerState() then return end
@@ -67,7 +71,9 @@ local function DropSoul()
     end
 end
 
--- Open soul jar function
+
+----------------------------------- Open Soul Jar -----------------------------------
+
 local function OpenSoulJar()
     DebugLog("Function: OpenSoulJar() called")
     if not CheckPlayerState() then return end
@@ -81,7 +87,8 @@ local function OpenSoulJar()
     end
 end
 
--- Self leap function
+----------------------------------- Self Leap ----------------------------------- 
+
 local function SelfLeap()
     DebugLog("Function: SelfLeap() called")
     if not CheckPlayerState() then return end
@@ -91,7 +98,8 @@ local function SelfLeap()
     G.SendRPCToServer(G.RPC.LeftClick, G.ACTIONS.BLINK.code, x, z)
 end
 
--- Count current souls in inventory
+----------------------------------- Count Current Souls In Inventory ----------------------------------- 
+
 local function GetCurrentSoulCount()
     DebugLog("Function: GetCurrentSoulCount() called")
     local count = 0
@@ -106,8 +114,8 @@ local function GetCurrentSoulCount()
     return count
 end
 
----- Soul Helper Functions
--- All soul data
+----------------------------------- Soul Helper Functions ----------------------------------- 
+
 local function GetAllSoulData()
     local player = G.ThePlayer
     local souls = {}
@@ -122,7 +130,7 @@ local function GetAllSoulData()
     return souls
 end
 
----- Jar Helper Functions
+----------------------------------- Jar Helper Functions ----------------------------------- 
 local function BuildJarList(filter)
     local list  = {}
     local items = G.ThePlayer.replica.inventory:GetItems()
@@ -150,8 +158,8 @@ local GetAllNonEmptyJarsData = function()
     end)
 end
 
--- Take souls from jars
--- Hello future me or whoever is reading this, this function is a bit complex so i'll add more comments to help with understanding.
+----------------------------------- Take Soul From Jar ----------------------------------- 
+
 local function TakeSoulFromJar(total_to_take, retry_count)
     DebugLog(string.format("Function: TakeSoulFromJar(%d,%d) called", total_to_take, retry_count or 0))
     -- Check player state
@@ -248,8 +256,9 @@ local function TakeSoulFromJar(total_to_take, retry_count)
     TryJar(1, total_to_take)
 end
 
--- Put souls in jars
--- Bit complex but ill explain later :)
+
+----------------------------------- Put Soul In Jar ----------------------------------- 
+
 local function PutSoulInJar(total_to_put, on_repeat)
     DebugLog("Function: PutSoulInJar() called")
     if not CheckPlayerState() then return end
@@ -259,7 +268,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
     on_repeat = on_repeat or false
 
     if player.is_already_performing_put_soul then
-        DebugLog("Already putting souls, aborting new request.")
+        DebugLog("Already storing souls, aborting new request.")
         return
     end
 
@@ -272,7 +281,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
 
 
     if #souls == 0 and not has_souls_in_hand then
-        DebugLog("No souls to put.")
+        DebugLog("No souls to store.")
         player.is_already_performing_put_soul = nil
         return
     end
@@ -315,7 +324,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
             end
         end
 
-        DebugLog("No more active souls to place.")
+        DebugLog("No more active souls to store.")
         player.is_already_performing_put_soul = nil
     end)
 end
@@ -324,14 +333,10 @@ end
 
 ----------------------------------- FOR TESTING PURPOSES ONLY ----------------------------------- 
 
--- For my testing purposes
 local function Test()
     if not CheckPlayerState() then return end
     print("TEST123")
 end
-
------------------------------------ END OF FOR TESTING PURPOSES ONLY ----------------------------------- 
-
 
 ----------------------------------- KEY HANDLERS ----------------------------------- 
 
@@ -368,5 +373,3 @@ if put_soul_in_jar_key ~= "None" then
         PutSoulInJar(amount_of_souls_to_store)
     end)
 end
-
------------------------------------ END OF KEY HANDLERS ----------------------------------- 

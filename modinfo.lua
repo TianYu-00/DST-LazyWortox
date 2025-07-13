@@ -11,6 +11,7 @@ Make playing Wortox easier with these convenient features:
 - Press a key to open soul jars effortlessly
 - Press a key to perform a leap in place
 - Press a key to withdraw souls from your soul jars
+- Press a key to Store souls from your inventory into jars
 
 You can customize all key bindings and settings in the mod options menu.
 ]]
@@ -23,6 +24,7 @@ or
 - 一键打开灵魂罐
 - 一键实现原地跳跃
 - 一键从灵魂罐中取出灵魂
+- 一键从物品栏中存入灵魂
 
 所有按键和设置均可在模组选项中自定义。
 ]]
@@ -50,7 +52,7 @@ api_version = 10
 
 -- Tags
 server_filter_tags = {
-   "wortox"
+   "wortox", "helper", "qol"
 }
 
 -- Key Options
@@ -201,7 +203,7 @@ configuration_options = {
         hover = not isCN and 
                         "Seconds to wait before checking if more souls remain in hand for the next store cycle."
                         or
-                        "再次检测手中是否还有灵魂前等待的秒数，用于放魂循环。",
+                        "检测手中是否还有灵魂前等待的秒数，用于放魂循环。",
         options = GenerateValueOptions(0.1, 1, 0.1),
         default = 0.4
     },
