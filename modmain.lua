@@ -116,57 +116,32 @@ local function GetAllSoulData()
 end
 
 ---- Jar Helper Functions
--- All jars data
-local function GetAllJarsData()
-    local player = G.ThePlayer
-    local jars = {}
-    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == PREFAB_JAR then
-            table.insert(jars, {
-            item = item,
-            index = jar_index
-            })
+local function BuildJarList(filter)
+    local list  = {}
+    local items = G.ThePlayer.replica.inventory:GetItems()
+    for index, item in pairs(items) do
+        if item and item.prefab == PREFAB_JAR and filter(item) then
+            list[#list + 1] = { item = item, index = index }
         end
     end
-    return jars
+    return list
 end
 
--- All not full jars data
-local function GetAllNotFullJarsData()
-    local player = G.ThePlayer
-    local jars = {}
-    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == PREFAB_JAR then
-            local used = item.replica._.inventoryitem.classified.percentused:value()
-            if used < 100 then
-                table.insert(jars, {
-                item = item,
-                index = jar_index
-                })
-            end
-        end
-    end
-    return jars
+local GetAllJarsData = function()
+    return BuildJarList(function() return true end)
 end
 
--- All non empty jars data
-local function GetAllNonEmptyJarsData()
-    local player = G.ThePlayer
-    local jars   = {}
-    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == PREFAB_JAR then
-            local used = item.replica._.inventoryitem.classified.percentused:value()
-            if used > 0 then
-                table.insert(jars, {
-                    item  = item,
-                    index = jar_index
-                })
-            end
-        end
-    end
-    return jars
+local GetAllNotFullJarsData = function()
+    return BuildJarList(function(jar)
+        return jar.replica._.inventoryitem.classified.percentused:value() < 100
+    end)
 end
 
+local GetAllNonEmptyJarsData = function()
+    return BuildJarList(function(jar)
+        return jar.replica._.inventoryitem.classified.percentused:value() > 0
+    end)
+end
 
 -- Take souls from jars
 -- Hello future me or whoever is reading this, this function is a bit complex so i'll add more comments to help with understanding.
