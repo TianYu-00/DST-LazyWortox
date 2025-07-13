@@ -289,7 +289,8 @@ local function PutSoulInJar(total_to_put, on_repeat)
     local active_item = player.replica.inventory:GetActiveItem()
 
     local souls = GetAllSoulData()
-    local has_souls_in_hand = active_item and active_item.prefab == "wortox_soul" and active_item.replica.stackable:StackSize() > 0
+    local has_souls_in_hand = active_item and active_item.prefab == "wortox_soul" and active_item.replica.stackable and active_item.replica.stackable:StackSize() > 0
+
 
     if #souls == 0 and not has_souls_in_hand then
         DebugLog("No souls to put.")
@@ -322,17 +323,15 @@ local function PutSoulInJar(total_to_put, on_repeat)
 
     G.SendRPCToServer(G.RPC.UseItemFromInvTile, G.ACTIONS.STORE.code, jars[1].item, nil, nil) -- Could cause stagger when movement speed is high while store action plays, but this way is faster and more efficient
     
-    player:DoTaskInTime(6 * G.FRAMES, function()
+    player:DoTaskInTime(0.4, function()
         local active_item = player.replica.inventory:GetActiveItem()
         if active_item and active_item.prefab == "wortox_soul" then
-            local stack_size = active_item.replica.stackable:StackSize()
+            local stack_size = (active_item.replica.stackable and active_item.replica.stackable:StackSize()) or 0
             DebugLog("Active soul stack size: " .. tostring(stack_size))
             if stack_size > 0 then
                 DebugLog("Still has soul in hand, repeating...")
                 player.is_already_performing_put_soul = nil
-                player:DoTaskInTime(frames_put_soul_in_jar_delay * G.FRAMES, function()
-                    PutSoulInJar(stack_size, true)
-                end)
+                PutSoulInJar(stack_size, true)
                 return
             end
         end
