@@ -12,6 +12,8 @@ local frames_to_wait_for_ui = GetModConfigData("Frames_To_Wait_For_UI") or 6
 local decimal_put_soul_in_jar_delay = GetModConfigData("Decimal_Put_Soul_In_Jar_Delay") or 3
 local frames_to_move_to_next_jar = GetModConfigData("Frames_To_Move_To_Next_Jar") or 1
 
+local PREFAB_SOUL  = "wortox_soul"
+local PREFAB_JAR   = "wortox_souljar"
 local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
 
 
@@ -37,7 +39,7 @@ local function DropSoul()
 
     -- Drop soul if it's being held by the cursor
     local active_item = player.replica.inventory:GetActiveItem()
-    if active_item and active_item.prefab == "wortox_soul" then
+    if active_item and active_item.prefab == PREFAB_SOUL then
         DebugLog("Found soul in active item, dropping it now")
         player.replica.inventory:DropItemFromInvTile(active_item)
         return
@@ -45,7 +47,7 @@ local function DropSoul()
 
     -- Otherwise try and find souls in inventory and drop from inventory
     for _, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_soul" then
+        if item and item.prefab == PREFAB_SOUL then
             DebugLog("Found soul in inventory, dropping it now")
             player.replica.inventory:DropItemFromInvTile(item)
             return
@@ -59,7 +61,7 @@ local function OpenSoulJar()
     if not CheckPlayerState() then return end
     local player = G.ThePlayer
     for _, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_souljar" then
+        if item and item.prefab == PREFAB_JAR then
             DebugLog("Found soul jar in inventory, opening it now")
             player.replica.inventory:UseItemFromInvTile(item)
             return
@@ -83,7 +85,7 @@ local function GetCurrentSoulCount()
     local count = 0
     local player = G.ThePlayer
     for _, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_soul" then
+        if item and item.prefab == PREFAB_SOUL then
             DebugLog("Found soul in inventory, counting it now")
             count = count + item.replica.stackable:StackSize()
             DebugLog(string.format("Current soul count: %d", count))
@@ -98,7 +100,7 @@ local function GetAllSoulData()
     local player = G.ThePlayer
     local souls = {}
     for slot_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_soul" then
+        if item and item.prefab == PREFAB_SOUL then
             table.insert(souls, {
                 item = item,
                 index = slot_index
@@ -114,7 +116,7 @@ local function GetAllJarsData()
     local player = G.ThePlayer
     local jars = {}
     for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_souljar" then
+        if item and item.prefab == PREFAB_JAR then
             table.insert(jars, {
             item = item,
             index = jar_index
@@ -129,7 +131,7 @@ local function GetAllNotFullJarsData()
     local player = G.ThePlayer
     local jars = {}
     for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_souljar" then
+        if item and item.prefab == PREFAB_JAR then
             local used = item.replica._.inventoryitem.classified.percentused:value()
             if used < 100 then
                 table.insert(jars, {
@@ -147,7 +149,7 @@ local function GetAllNonEmptyJarsData()
     local player = G.ThePlayer
     local jars   = {}
     for jar_index, item in pairs(player.replica.inventory:GetItems()) do
-        if item and item.prefab == "wortox_souljar" then
+        if item and item.prefab == PREFAB_JAR then
             local used = item.replica._.inventoryitem.classified.percentused:value()
             if used > 0 then
                 table.insert(jars, {
@@ -279,7 +281,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
     local active_item = player.replica.inventory:GetActiveItem()
 
     local souls = GetAllSoulData()
-    local has_souls_in_hand = active_item and active_item.prefab == "wortox_soul" and active_item.replica.stackable and active_item.replica.stackable:StackSize() > 0
+    local has_souls_in_hand = active_item and active_item.prefab == PREFAB_SOUL and active_item.replica.stackable and active_item.replica.stackable:StackSize() > 0
 
 
     if #souls == 0 and not has_souls_in_hand then
@@ -315,7 +317,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
     
     player:DoTaskInTime(decimal_put_soul_in_jar_delay, function()
         local active_item = player.replica.inventory:GetActiveItem()
-        if active_item and active_item.prefab == "wortox_soul" then
+        if active_item and active_item.prefab == PREFAB_SOUL then
             local stack_size = (active_item.replica.stackable and active_item.replica.stackable:StackSize()) or 0
             DebugLog("Active soul stack size: " .. tostring(stack_size))
             if stack_size > 0 then
