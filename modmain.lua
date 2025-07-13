@@ -92,9 +92,7 @@ local function GetCurrentSoulCount()
     return count
 end
 
-
 ---- Soul Helper Functions
-
 -- All soul data
 local function GetAllSoulData()
     local player = G.ThePlayer
@@ -110,11 +108,7 @@ local function GetAllSoulData()
     return souls
 end
 
-
-
-
 ---- Jar Helper Functions
-
 -- All jars data
 local function GetAllJarsData()
     local player = G.ThePlayer
@@ -148,6 +142,25 @@ local function GetAllNotFullJarsData()
     return jars
 end
 
+-- All non empty jars data
+local function GetAllNonEmptyJarsData()
+    local player = G.ThePlayer
+    local jars   = {}
+    for jar_index, item in pairs(player.replica.inventory:GetItems()) do
+        if item and item.prefab == "wortox_souljar" then
+            local used = item.replica._.inventoryitem.classified.percentused:value()
+            if used > 0 then
+                table.insert(jars, {
+                    item  = item,
+                    index = jar_index
+                })
+            end
+        end
+    end
+    return jars
+end
+
+
 -- Take souls from jars
 -- Hello future me or whoever is reading this, this function is a bit complex so i'll add more comments to help with understanding.
 local function TakeSoulFromJar(total_to_take, retry_count)
@@ -169,8 +182,7 @@ local function TakeSoulFromJar(total_to_take, retry_count)
     -- Record the current soul count to verify gain later
     local before_count = GetCurrentSoulCount()
 
-    -- Collect all soul jars from player's inventory
-    local jars = GetAllJarsData()
+    local jars = GetAllNonEmptyJarsData()
 
     if #jars == 0 or total_to_take <= 0 then
         DebugLog("No jars or nothing to take.")
@@ -187,8 +199,7 @@ local function TakeSoulFromJar(total_to_take, retry_count)
         if index > #jars or souls_left <= 0 then
             -- Wait briefly, then compare soul count to confirm how many were gained
             player:DoTaskInTime(0.4, function()
-                local after_count = GetCurrentSoulCount()
-                local gained = after_count - before_count
+                local gained  = GetCurrentSoulCount() - before_count
                 local missing = total_to_take - gained
 
                 DebugLog(string.format("Took %d/%d souls", gained, total_to_take))
@@ -207,23 +218,15 @@ local function TakeSoulFromJar(total_to_take, retry_count)
 
         -- Select the current jar
         local jar = jars[index].item
-        -- Calculate current soul count in the jar based on its percent used
         local percent = jar.replica._.inventoryitem.classified.percentused:value()
         local in_jar = math.floor((percent / 100) * jar_capacity)
-
-        -- Skip empty jars
-        if in_jar <= 0 then
-            return TryJar(index + 1, souls_left)
-        end
-
-        -- Take as many souls as needed or available
         local take = math.min(in_jar, souls_left)
         DebugLog(string.format("Taking %d souls from jar %d (has %d)", take, index, in_jar))
 
-        -- Open the jar by simulating right-click
+        -- Open jar UI
         player.replica.inventory:UseItemFromInvTile(jar)
-        local retries = 0
 
+        local retries = 0
         -- Wait for the jar UI to open (signaled by the "doing" tag)
         local function WaitForOpen()
             DebugLog("Function: WaitForOpen() called")
