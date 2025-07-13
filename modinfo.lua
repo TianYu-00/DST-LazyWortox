@@ -69,39 +69,14 @@ for i = 1, #keys do
 end
 
 -- Value Options
-local value_options = {}
-local values = {
-    1,2,3,4,5,6,7,8,9,10,
-    11,12,13,14,15,16,17,18,19,20,
-}
-
-for i = 1, #values do
-    value_options[i] = {description = values[i], data = values[i]}
-end
-
--- Frame Options
-local frame_options = {}
-local frames = {
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50,
-    51, 52, 53, 54, 55, 56, 57, 58, 59, 60
-}
-
-for i = 1, #frames do
-    frame_options[i] = {description = frames[i], data = frames[i]}
-end
-
--- Decimal Options
-local decimal_options = {}
-local decimals = {
-    0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1
-}
-
-for i = 1, #decimals do
-    decimal_options[i] = {description = decimals[i], data = decimals[i]}
+local function GenerateValueOptions(min, max, step)
+    local options = {}
+    local i = 1
+    for v = min, max, step or 1 do
+        options[i] = { description = v, data = v }
+        i = i + 1
+    end
+    return options
 end
 
 -- Mod Config Helper
@@ -161,7 +136,7 @@ configuration_options = {
                         "How many souls to automatically extract from your jars each time you press the key.\nSet higher to withdraw more at once." 
                         or
                         "每次按键自动从血罐中取出的灵魂数量。\n数值越高，一次性取出越多。",
-        options = value_options,
+        options = GenerateValueOptions(1, 20),
         default = 5
     },
     {
@@ -171,7 +146,7 @@ configuration_options = {
                         "Number of times to retry taking souls from jars if the desired amount wasn't taken." 
                         or 
                         "如果未成功取出足够的灵魂，重试取魂的次数。",
-        options = value_options,
+        options = GenerateValueOptions(1, 5),
         default = 1
     },
     {
@@ -181,7 +156,7 @@ configuration_options = {
                         "Number of frames to wait after opening the jar UI before taking souls.\nToo low may cause errors if the UI isn’t ready yet." 
                         or
                         "打开罐子界面后等待的帧数，之后才开始取出灵魂。\n等待时间太短可能导致UI未准备好而出错。",
-        options = frame_options,
+        options = GenerateValueOptions(1, 60),
         default = 6
     },
     {
@@ -191,7 +166,7 @@ configuration_options = {
                         "Number of frames to wait after taking souls before attempting the next jar.\nHelps ensure the previous transfer completes smoothly."
                         or
                         "取出灵魂后，切换到下一个罐子前等待的帧数。\n确保上一次转移顺利完成。",
-        options = frame_options,
+        options = GenerateValueOptions(1, 60),
         default = 2
     },
     {
@@ -201,7 +176,7 @@ configuration_options = {
                         ""
                         or
                         "",
-        options = decimal_options,
+        options = GenerateValueOptions(0.1, 1, 0.1),
         default = 0.4
     },
     {
