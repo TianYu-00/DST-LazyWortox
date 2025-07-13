@@ -13,7 +13,7 @@ local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
 local wait_for_ui_delay = GetModConfigData("Wait_For_UI_Delay") or 6
 local move_to_next_jar_delay = GetModConfigData("Move_To_Next_Jar_Delay") or 2
 -- Put soul settings
-local put_soul_in_jar_delay = GetModConfigData("Put_Soul_In_Jar_Delay") or 0.4
+local soul_hand_check_interval = GetModConfigData("Soul_Hand_Check_Interval") or 0.4
 -- Debud settings
 local debug_mode = GetModConfigData("Debug_Mode") or false
 
@@ -301,7 +301,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
 
     G.SendRPCToServer(G.RPC.UseItemFromInvTile, G.ACTIONS.STORE.code, jars[1].item, nil, nil) -- Could cause stagger when movement speed is high while store action plays, but this way is faster and more efficient
     
-    player:DoTaskInTime(put_soul_in_jar_delay, function()
+    player:DoTaskInTime(soul_hand_check_interval , function()
         local active_item = player.replica.inventory:GetActiveItem()
         if active_item and active_item.prefab == PREFAB_SOUL then
             local stack_size = GetStackSize(active_item)

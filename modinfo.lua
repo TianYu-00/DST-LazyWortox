@@ -95,88 +95,103 @@ configuration_options = {
     AddSection("Settings","设置"),
     {
         name = "Soul_Drop_Key",
-        label = not isCN and "Soul Drop Key" or "灵魂释放按键",
-        hover = not isCN and "Press this key to drop soul(s) from your inventory." or "按下此键从背包中丢弃灵魂。",
+        label = not isCN and "Drop Soul Key" or "丢弃灵魂按键",
+        hover = not isCN and 
+                        "Key that instantly drops any soul you’re holding or the first soul in your inventory."
+                        or
+                        "快速丢弃手中或背包灵魂的按键。",
         options = key_options,
         default = "R"
     },
     {
         name = "Open_Soul_Jar_Key",
-        label = not isCN and "Open Soul Jar Key" or "打开魂罐按键",
-        hover = not isCN and "Press this key to open soul jar" or "按下此键打开灵魂罐",
+        label = not isCN and "Open Jar Key" or "打开罐子按键",
+        hover = not isCN and 
+                        "Opens the first soul‑jar found in your inventory."
+                        or
+                        "打开背包中第一个灵魂罐。",
         options = key_options,
         default = "C"
     },
     {
         name = "Self_Leap_Key",
-        label = not isCN and "Self Leap Key" or "原地跳跃按键",
-        hover = not isCN and "Press this key to perform a leap on the spot." or "按下此键执行原地跳跃动作",
+        label = not isCN and "Self‑Leap Key" or "原地跳跃按键",
+        hover = not isCN and 
+                        "Makes Wortox jump on the spot."
+                        or
+                        "让小恶魔原地跳跃。",
         options = key_options,
         default = "V"
     },
     {
         name = "Take_Soul_From_Jar_Key",
-        label = not isCN and "Take Soul From Jar Key" or "罐子取魂按键",
-        hover = not isCN and "Press this key to withdraw souls from your soul jars." or "按下此键从灵魂罐中取出灵魂。",
+        label = not isCN and "Take Soul Key" or "取魂按键",
+        hover = not isCN and 
+                        "Withdraws souls from jars."
+                        or
+                        "从灵魂罐取出灵魂。",
         options = key_options,
         default = "B"
     },
     {
         name = "Put_Soul_In_Jar_Key",
-        label = not isCN and "Put Soul In Jar Key" or "罐子放魂按键",
-        hover = not isCN and "" or "",
+        label = not isCN and "Store Soul Key" or "存魂按键",
+        hover = not isCN and 
+                        "Stores souls into jars."
+                        or 
+                        "将灵魂存入罐子。",
         options = key_options,
         default = "G"
     },
     AddSection("Souls To Take Settings","取魂设置"),
     {
         name = "Amount_Of_Souls_To_Take",
-        label = not isCN and "Amount Of Souls To Take" or "取魂数量",
+        label = not isCN and "Souls per Take" or "每次取魂数量",
         hover = not isCN and 
-                        "How many souls to automatically extract from your jars each time you press the key.\nSet higher to withdraw more at once." 
+                        "How many souls to withdraw each time you press the key." 
                         or
-                        "每次按键自动从血罐中取出的灵魂数量。\n数值越高，一次性取出越多。",
+                        "每次按取魂键时要取出的灵魂数量。",
         options = GenerateValueOptions(1, 20),
         default = 5
     },
     {
         name = "Take_Soul_Retries",
-        label = not isCN and "Soul Take Retry Attempts" or "取魂重试次数",
+        label = not isCN and "Take Retries" or "取魂重试次数",
         hover = not isCN and 
-                        "Number of times to retry taking souls from jars if the desired amount wasn't taken." 
-                        or 
-                        "如果未成功取出足够的灵魂，重试取魂的次数。",
+                        "Number of extra attempts if the desired amount wasn’t taken." 
+                        or
+                        "若未成功取出足够的灵魂时重试的次数。",
         options = GenerateValueOptions(1, 5),
         default = 1
     },
     {
         name = "Wait_For_UI_Delay",
-        label = not isCN and "Frames to Wait for UI" or "等待UI打开的帧数",
+        label = not isCN and "UI Wait (frames)" or "等待UI帧数",
         hover = not isCN and 
-                        "Number of frames to wait after opening the jar UI before taking souls.\nToo low may cause errors if the UI isn’t ready yet." 
+                        "Frames to wait after opening a jar UI before moving souls." 
                         or
-                        "打开罐子界面后等待的帧数，之后才开始取出灵魂。\n等待时间太短可能导致UI未准备好而出错。",
+                        "打开罐子界面后等待的游戏帧数，再开始取魂。",
         options = GenerateValueOptions(1, 60),
         default = 6
     },
     {
         name = "Move_To_Next_Jar_Delay",
-        label = not isCN and "Frames Before Moving to Next Jar" or "切换到下一个罐子前等待的帧数",
+        label = not isCN and "Delay Between Jars" or "罐子切换延迟",
         hover = not isCN and 
-                        "Number of frames to wait after taking souls before attempting the next jar.\nHelps ensure the previous transfer completes smoothly."
+                        "Frames to wait after withdrawing souls from one jar \n" .. "before starting to interact with the next jar."
                         or
-                        "取出灵魂后，切换到下一个罐子前等待的帧数。\n确保上一次转移顺利完成。",
+                        "从一个罐子取出灵魂后，在操作下一个罐子前等待的帧数。",
         options = GenerateValueOptions(1, 60),
         default = 2
     },
     AddSection("Souls To Put Settings","放魂设置"),
     {
-        name = "Put_Soul_In_Jar_Delay",
-        label = not isCN and "Put Soul Delay (Seconds)" or "放灵魂延迟（秒数）",
+        name = "Soul_Hand_Check_Interval",
+        label = not isCN and "Hand‑Check (sec)" or "手持检查间隔",
         hover = not isCN and 
-                        ""
+                        "Seconds to wait before checking if more souls remain in hand for the next store cycle."
                         or
-                        "",
+                        "再次检测手中是否还有灵魂前等待的秒数，用于放魂循环。",
         options = GenerateValueOptions(0.1, 1, 0.1),
         default = 0.4
     },
@@ -185,9 +200,9 @@ configuration_options = {
         name = "Debug_Mode",
         label = not isCN and "Debug Mode" or "调试模式",
         hover = not isCN and 
-            "Debug mode will print additional information to the console.\nUseful for troubleshooting or development."
-            or
-            "调试模式会在控制台打印额外信息。\n有助于故障排除或开发。",
+                        "Debug mode will print additional information to the console.\nUseful for troubleshooting or development."
+                        or
+                        "调试模式会在控制台显示额外信息。\n有助于故障排除或开发。",
         options = {
             { description = "True", data = true },
             { description = "False", data = false }
