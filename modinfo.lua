@@ -128,7 +128,7 @@ configuration_options = {
         options = key_options,
         default = "G"
     },
-    AddSection("Advanced Settings","高级设置"),
+    AddSection("Souls To Take Settings","取魂设置"),
     {
         name = "Amount_Of_Souls_To_Take",
         label = not isCN and "Amount Of Souls To Take" or "取魂数量",
@@ -169,6 +169,7 @@ configuration_options = {
         options = GenerateValueOptions(1, 60),
         default = 2
     },
+    AddSection("Souls To Put Settings","放魂设置"),
     {
         name = "Decimal_Put_Soul_In_Jar_Delay",
         label = not isCN and "Put Soul Delay (Seconds)" or "放灵魂延迟（秒数）",
@@ -179,6 +180,7 @@ configuration_options = {
         options = GenerateValueOptions(0.1, 1, 0.1),
         default = 0.4
     },
+    AddSection("Debug","调试"),
     {
         name = "Debug_Mode",
         label = not isCN and "Debug Mode" or "调试模式",
