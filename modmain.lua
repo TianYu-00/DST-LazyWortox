@@ -23,6 +23,11 @@ local function DebugLog (msg)
     print("[Lazy Wortox] " .. msg)
 end
 
+-- Stack size validator function to validate the stackable item
+local function GetStackSize(item)
+    return (item and item.replica.stackable and item.replica.stackable:StackSize()) or 0
+end
+
 
 -- Check if the player is Wortox and is in game but also not input focused (typing in search bar or chat etc)
 local function CheckPlayerState()
@@ -281,7 +286,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
     local active_item = player.replica.inventory:GetActiveItem()
 
     local souls = GetAllSoulData()
-    local has_souls_in_hand = active_item and active_item.prefab == PREFAB_SOUL and active_item.replica.stackable and active_item.replica.stackable:StackSize() > 0
+    local has_souls_in_hand = active_item and active_item.prefab == PREFAB_SOUL and GetStackSize(active_item) > 0
 
 
     if #souls == 0 and not has_souls_in_hand then
@@ -318,7 +323,7 @@ local function PutSoulInJar(total_to_put, on_repeat)
     player:DoTaskInTime(decimal_put_soul_in_jar_delay, function()
         local active_item = player.replica.inventory:GetActiveItem()
         if active_item and active_item.prefab == PREFAB_SOUL then
-            local stack_size = (active_item.replica.stackable and active_item.replica.stackable:StackSize()) or 0
+            local stack_size = GetStackSize(active_item)
             DebugLog("Active soul stack size: " .. tostring(stack_size))
             if stack_size > 0 then
                 DebugLog("Still has soul in hand, repeating...")
