@@ -107,7 +107,6 @@ end
 ----------------------------------- Count Current Souls In Inventory ----------------------------------- 
 
 local function GetCurrentSoulCount()
-    if not CheckPlayerState() then return end
     DebugLog("Function: GetCurrentSoulCount() called")
     local count = 0
     local player = G.ThePlayer
@@ -124,7 +123,6 @@ end
 ----------------------------------- Soul Helper Functions ----------------------------------- 
 
 local function GetAllSoulData()
-    if not CheckPlayerState() then return end
     local player = G.ThePlayer
     local souls = {}
     for slot_index, item in pairs(player.replica.inventory:GetItems()) do
@@ -140,7 +138,6 @@ end
 
 ----------------------------------- Jar Helper Functions ----------------------------------- 
 local function BuildJarList(filter)
-    if not CheckPlayerState() then return end
     local list  = {}
     local items = G.ThePlayer.replica.inventory:GetItems()
     for index, item in pairs(items) do
@@ -400,8 +397,6 @@ local function CreateRangeIndicator(inst, rotation, scale, color)
 end
 
 local function GetHealRange()
-    if not CheckPlayerState() then return end
-
     local player = G.ThePlayer
     local skilltreeupdater = player and player.components.skilltreeupdater
     if not skilltreeupdater then return SOULHEAL_RANGE end
