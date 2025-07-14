@@ -56,16 +56,34 @@ server_filter_tags = {
 }
 
 -- Key Options
--- ..\SteamLibrary\steamapps\common\Don't Starve Together\data\databundles\scripts.zip\scripts\constants.lua
 local key_options = {}
 local keys = {
     "None",
+    -- Numbers
     "0","1","2","3","4","5","6","7","8","9",
+    "None",
+    -- Letters
     "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
+    "None",
+    -- Function keys
     "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10","F11","F12",
-    "ALT","CTRL","SHIFT","TAB","BACKSPACE","PERIOD","SLASH","SEMICOLON","LEFTBRACKET","RIGHTBRACKET","BACKSLASH","TILDE"
+    "None",
+    -- Numpad
+    "KP_0","KP_1","KP_2","KP_3","KP_4","KP_5","KP_6","KP_7","KP_8","KP_9",
+    "KP_PERIOD","KP_DIVIDE","KP_MULTIPLY","KP_MINUS","KP_PLUS",
+    "KP_ENTER","KP_EQUALS",
+    "None",
+    -- Control & Modifier keys
+    "TAB","SPACE","ENTER","ESCAPE","BACKSPACE","INSERT","DELETE","HOME","END","PAGEUP","PAGEDOWN",
+    "PAUSE","PRINT","CAPSLOCK","SCROLLOCK","LSHIFT","RSHIFT","LCTRL","RCTRL","LALT","RALT",
+    "LSUPER","RSUPER",
+    "None",
+    -- Symbols / Punctuation
+    "MINUS","EQUALS","PERIOD","SLASH","SEMICOLON","LEFTBRACKET","RIGHTBRACKET","BACKSLASH","TILDE",
+    "None",
+    -- Arrows
+    "UP","DOWN","RIGHT","LEFT"
 }
-
 for i = 1, #keys do
     key_options[i] = {description = keys[i], data = keys[i]}
 end
