@@ -11,7 +11,9 @@ Make playing Wortox easier with these convenient features:
 - Press a key to open soul jars effortlessly
 - Press a key to perform a leap in place
 - Press a key to withdraw souls from your soul jars
-- Press a key to Store souls from your inventory into jars
+- Press a key to store souls from your inventory into jars
+- Press a key to leap towards mouse position
+- Press a key to show range indicators for soul hop and heal
 
 You can customize all key bindings and settings in the mod options menu.
 ]]
@@ -24,7 +26,9 @@ or
 - 一键打开灵魂罐
 - 一键实现原地跳跃
 - 一键从灵魂罐中取出灵魂
-- 一键从物品栏中存入灵魂
+- 一键将物品栏的灵魂存入灵魂罐
+- 一键向鼠标位置跳跃
+- 一键显示灵魂跳跃与治疗范围指示圈
 
 所有按键和设置均可在模组选项中自定义。
 ]]
@@ -167,21 +171,21 @@ configuration_options = {
     },
     {
         name = "Leap_To_Mouse_Key",
-        label = not isCN and "Leap_To_Mouse_Key" or "Leap_To_Mouse_Key",
+        label = not isCN and "Leap To Mouse Key" or "跳跃到鼠标键",
         hover = not isCN and 
-                        ""
+                        "Soul‑hop to current mouse position."
                         or 
-                        "",
+                        "在鼠标指针位置进行灵魂跃迁。",
         options = key_options,
-        default = "H" -- Temp default, remember to change it later !!!
+        default = "H" -- Temp default
     },
     {
         name = "Show_Range_Key",
-        label = not isCN and "Show_Range_Key" or "Show_Range_Key",
+        label = not isCN and "Show Range Key" or "范围显示键",
         hover = not isCN and 
-                        ""
+                        "Toggle the visual range circles for soul‑hop and healing."
                         or 
-                        "",
+                        "灵魂跳跃与治疗范围指示圈开关。",
         options = key_options,
         default = "F7"
     },
