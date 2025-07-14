@@ -82,7 +82,9 @@ local keys = {
     "MINUS","EQUALS","PERIOD","SLASH","SEMICOLON","LEFTBRACKET","RIGHTBRACKET","BACKSLASH","TILDE",
     "None",
     -- Arrows
-    "UP","DOWN","RIGHT","LEFT"
+    "UP","DOWN","RIGHT","LEFT",
+    -- Mouse Buttons -- strings.lua, line 13640
+    "\238\132\128", "\238\132\129", "\238\132\130","\238\132\133","\238\132\134","\238\132\131","\238\132\132"
 }
 for i = 1, #keys do
     key_options[i] = {description = keys[i], data = keys[i]}
@@ -181,7 +183,7 @@ configuration_options = {
                         or 
                         "",
         options = key_options,
-        default = "F7" -- Temp default, remember to change it later !!!
+        default = "F7"
     },
     AddSection("Souls To Take Settings","取魂设置"),
     {

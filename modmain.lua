@@ -45,7 +45,6 @@ end
 ----------------------------------- Check Player State ----------------------------------- 
 
 local function CheckPlayerState()
-    DebugLog("Function: CheckPlayerState() called")
     local player = G.ThePlayer
     return player ~= nil and player.prefab == "wortox" and player.HUD and not player.HUD:HasInputFocus()
 end
@@ -53,8 +52,8 @@ end
 ----------------------------------- Drop Soul ----------------------------------- 
 
 local function DropSoul()
-    DebugLog("Function: DropSoul() called")
     if not CheckPlayerState() then return end
+    DebugLog("Function: DropSoul() called")
     local player = G.ThePlayer
 
     -- Drop soul if it's being held by the cursor
@@ -79,8 +78,8 @@ end
 ----------------------------------- Open Soul Jar -----------------------------------
 
 local function OpenSoulJar()
-    DebugLog("Function: OpenSoulJar() called")
     if not CheckPlayerState() then return end
+    DebugLog("Function: OpenSoulJar() called")
     local player = G.ThePlayer
     for _, item in pairs(player.replica.inventory:GetItems()) do
         if item and item.prefab == PREFAB_JAR then
@@ -94,8 +93,8 @@ end
 ----------------------------------- Self Leap ----------------------------------- 
 
 local function SelfLeap()
-    DebugLog("Function: SelfLeap() called")
     if not CheckPlayerState() then return end
+    DebugLog("Function: SelfLeap() called")
     local player = G.ThePlayer
     local x, y, z = player.Transform:GetWorldPosition()
     DebugLog(string.format("Performing self leap at position: (%.2f, %.2f, %.2f)", x, y, z))
@@ -105,6 +104,7 @@ end
 ----------------------------------- Count Current Souls In Inventory ----------------------------------- 
 
 local function GetCurrentSoulCount()
+    if not CheckPlayerState() then return end
     DebugLog("Function: GetCurrentSoulCount() called")
     local count = 0
     local player = G.ThePlayer
@@ -121,6 +121,7 @@ end
 ----------------------------------- Soul Helper Functions ----------------------------------- 
 
 local function GetAllSoulData()
+    if not CheckPlayerState() then return end
     local player = G.ThePlayer
     local souls = {}
     for slot_index, item in pairs(player.replica.inventory:GetItems()) do
@@ -136,6 +137,7 @@ end
 
 ----------------------------------- Jar Helper Functions ----------------------------------- 
 local function BuildJarList(filter)
+    if not CheckPlayerState() then return end
     local list  = {}
     local items = G.ThePlayer.replica.inventory:GetItems()
     for index, item in pairs(items) do
@@ -165,9 +167,8 @@ end
 ----------------------------------- Take Soul From Jar ----------------------------------- 
 
 local function TakeSoulFromJar(total_to_take, retry_count)
-    DebugLog(string.format("Function: TakeSoulFromJar(%d,%d) called", total_to_take, retry_count or 0))
-    -- Check player state
     if not CheckPlayerState() then return end
+    DebugLog(string.format("Function: TakeSoulFromJar(%d,%d) called", total_to_take, retry_count or 0))
     local player = G.ThePlayer
     total_to_take = total_to_take or 5 -- Default to 5 souls if no value provided
     retry_count = retry_count or 0 -- Retry count for attempts to reach the goal
@@ -264,9 +265,8 @@ end
 ----------------------------------- Put Soul In Jar ----------------------------------- 
 
 local function PutSoulInJar(total_to_put, on_repeat)
-    DebugLog("Function: PutSoulInJar() called")
     if not CheckPlayerState() then return end
-
+    DebugLog("Function: PutSoulInJar() called")
     local player = G.ThePlayer
     total_to_put = total_to_put or 5
     on_repeat = on_repeat or false
@@ -336,8 +336,8 @@ end
 ----------------------------------- Leap To Mouse ----------------------------------- 
 
 local function LeapToMouse()
-    DebugLog("Function: LeapToMouse() called")
     if not CheckPlayerState() then return end
+    DebugLog("Function: LeapToMouse() called")
     local soul_amount = GetCurrentSoulCount()
     if soul_amount <= 0 then
         DebugLog("No souls to leap with.")
@@ -401,6 +401,7 @@ end
 -- But that is it for today, it is bed time - 4:20 AM - 14/07/2025
 local function ToggleRangeIndicator()
     if not CheckPlayerState() then return end
+    DebugLog("Function: ToggleRangeIndicator() called")
     local player = G.ThePlayer
     if not player then return end
 
@@ -432,52 +433,54 @@ end
 
 ----------------------------------- KEY HANDLERS ----------------------------------- 
 
--- Soul Drop Handler
-if soul_drop_key ~= "None" then
-    local keycode = G["KEY_" .. soul_drop_key]
-    G.TheInput:AddKeyDownHandler(keycode, DropSoul)
+local mouse_map = {
+    -- strings.lua, line 13640
+    ['\238\132\128'] = 1000, -- MOUSEBUTTON_LEFT
+    ['\238\132\129'] = 1001, -- MOUSEBUTTON_RIGHT
+    ['\238\132\130'] = 1002, -- MOUSEBUTTON_MIDDLE
+    ['\238\132\133'] = 1003, -- MOUSEBUTTON_SCROLLUP
+    ['\238\132\134'] = 1004, -- MOUSEBUTTON_SCROLLDOWN
+    ['\238\132\131'] = 1005, -- MOUSEBUTTON_4
+    ['\238\132\132'] = 1006, -- MOUSEBUTTON_5
+}
+
+local function InputHelper(key, on_down_fn, on_up_fn)
+    if not key or key == "None" then return end
+
+    local code = mouse_map[key] or G["KEY_" .. key]
+
+    if not code then return end
+
+    DebugLog("CODE for key: " .. key .. " is: " .. tostring(code))
+
+    if code >= 1000 and code <= 1006 then
+        -- Mouse key
+        G.TheInput:AddMouseButtonHandler(function(button, down, x, y)
+            if button == code then
+                if down and on_down_fn then
+                    on_down_fn()
+                elseif (not down) and on_up_fn then
+                    on_up_fn()
+                end
+            end
+        end)
+    else
+        -- Keyboard key
+        if on_down_fn then
+            G.TheInput:AddKeyDownHandler(code, on_down_fn)
+        end
+        if on_up_fn then
+            G.TheInput:AddKeyUpHandler(code, on_up_fn)
+        end
+    end
 end
 
--- Open Soul Jar Handler
-if open_soul_jar_key ~= "None" then
-    local keycode = G["KEY_" .. open_soul_jar_key]
-    G.TheInput:AddKeyUpHandler(keycode, OpenSoulJar)
-end
-
--- Self Leap Handler
-if self_leap_key ~= "None" then
-    local keycode = G["KEY_" .. self_leap_key]
-    G.TheInput:AddKeyDownHandler(keycode, SelfLeap)
-end
-
--- Take Soul From Jar Handler
-if take_soul_from_jar_key ~= "None" then
-    local keycode = G["KEY_" .. take_soul_from_jar_key]
-    G.TheInput:AddKeyUpHandler(keycode, function()
-        TakeSoulFromJar(amount_of_souls_to_take)
-    end)
-end
-
--- Put Soul In Jar Handler
-if put_soul_in_jar_key ~= "None" then
-    local keycode = G["KEY_" .. put_soul_in_jar_key]
-    G.TheInput:AddKeyUpHandler(keycode, function()
-        PutSoulInJar(amount_of_souls_to_store)
-    end)
-end
-
--- Leap To Mouse Handler
-if leap_to_mouse_key ~= "None" then
-    local keycode = G["KEY_" .. leap_to_mouse_key]
-    G.TheInput:AddKeyUpHandler(keycode, function()
-        LeapToMouse()
-    end)
-end
-
--- Toggle Leap Range Handler
-if show_range_key ~= "None" then
-    local keycode = G["KEY_" .. show_range_key]
-    G.TheInput:AddKeyUpHandler(keycode, function()
-        ToggleRangeIndicator()
-    end)
-end
+AddSimPostInit(function()
+    InputHelper(soul_drop_key, DropSoul, nil)
+    InputHelper(open_soul_jar_key, nil, OpenSoulJar)
+    InputHelper(self_leap_key, SelfLeap, nil)
+    InputHelper(take_soul_from_jar_key, nil, function() TakeSoulFromJar(amount_of_souls_to_take) end)
+    InputHelper(put_soul_in_jar_key, nil, function() PutSoulInJar(amount_of_souls_to_store) end)
+    InputHelper(leap_to_mouse_key, nil, LeapToMouse)
+    InputHelper(show_range_key, nil, ToggleRangeIndicator)
+end)
