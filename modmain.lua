@@ -23,12 +23,12 @@ local debug_mode = GetModConfigData("Debug_Mode") or false
 --
 local PREFAB_SOUL  = "wortox_soul"
 local PREFAB_JAR   = "wortox_souljar"
-local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40
+local JAR_CAPACITY = G.TUNING.STACK_SIZE_SMALLITEM or 40
 local MAX_LEAP_DISTANCE = G.ACTIONS.BLINK.distance or 36
 local SOULHEAL_RANGE = G.TUNING.WORTOX_SOULHEAL_RANGE or 8
 local SOULHEAL_SKILLTREE_1_RANGE = G.TUNING.SKILLS.WORTOX.WORTOX_SOULPROTECTOR_1_RANGE or 3
 local SOULHEAL_SKILLTREE_2_RANGE = G.TUNING.SKILLS.WORTOX.WORTOX_SOULPROTECTOR_2_RANGE or 3
-local range_circles = nil
+local RANGE_CIRCLES = nil
 
 
 ----------------------------------- Debug Log ----------------------------------- 
@@ -224,7 +224,7 @@ local function TakeSoulFromJar(total_to_take, retry_count)
         -- Select the current jar
         local jar = jars[index].item
         local percent = jar.replica._.inventoryitem.classified.percentused:value()
-        local in_jar = math.floor((percent / 100) * jar_capacity)
+        local in_jar = math.floor((percent / 100) * JAR_CAPACITY)
         local take = math.min(in_jar, souls_left)
         DebugLog(string.format("Taking %d souls from jar %d (has %d)", take, index, in_jar))
 
@@ -430,18 +430,18 @@ local function ToggleRangeIndicator()
     if not player then return end
 
     -- If range circles already exist, remove them and clear the table
-    if range_circles then
-        for _, circle in pairs(range_circles) do
+    if RANGE_CIRCLES then
+        for _, circle in pairs(RANGE_CIRCLES) do
             if circle and circle:IsValid() then
                 circle:Remove()
             end
         end
-        range_circles = nil
+        RANGE_CIRCLES = nil
         return
     end
 
     -- Create new range circles
-    range_circles = {
+    RANGE_CIRCLES = {
         CreateRangeIndicator(player, 0, ScaleCalculator(MAX_LEAP_DISTANCE), {0, 1, 1, 0}),
         CreateRangeIndicator(player, 0, ScaleCalculator(GetHealRange()), {1, 0, 0, 0}),
     }
