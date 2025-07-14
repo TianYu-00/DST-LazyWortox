@@ -25,6 +25,9 @@ local PREFAB_SOUL  = "wortox_soul"
 local PREFAB_JAR   = "wortox_souljar"
 local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40
 local MAX_LEAP_DISTANCE = G.ACTIONS.BLINK.distance or 36
+local SOULHEAL_RANGE = G.TUNING.WORTOX_SOULHEAL_RANGE or 8
+local SOULHEAL_SKILLTREE_1_RANGE = G.TUNING.SKILLS.WORTOX.WORTOX_SOULPROTECTOR_1_RANGE or 3
+local SOULHEAL_SKILLTREE_2_RANGE = G.TUNING.SKILLS.WORTOX.WORTOX_SOULPROTECTOR_2_RANGE or 3
 local range_circles = nil
 
 
@@ -396,6 +399,29 @@ local function CreateRangeIndicator(inst, rotation, scale, color)
     return circle
 end
 
+local function GetHealRange()
+    if not CheckPlayerState() then return end
+
+    local player = G.ThePlayer
+    local skilltreeupdater = player and player.components.skilltreeupdater
+    if not skilltreeupdater then return SOULHEAL_RANGE end
+
+    local final_range = SOULHEAL_RANGE
+
+    if skilltreeupdater:IsActivated("wortox_soulprotector_1") then
+        final_range = final_range + SOULHEAL_SKILLTREE_1_RANGE
+        if skilltreeupdater:IsActivated("wortox_soulprotector_2") then
+            final_range = final_range + SOULHEAL_SKILLTREE_2_RANGE
+        end
+    end
+
+    return final_range
+end
+
+local function ScaleCalculator(range)
+    return math.sqrt(range * 300 / 1900)
+end
+
 -- NOTE: MAYBE work on splitting up the range indicators to provide more flexibility in the future BUT for now, this is fine.
 -- Also should probably update the labels and hovers in modinfo.lua -- Need to update Leap_To_Mouse_Key and Show_Range_Key.
 -- But that is it for today, it is bed time - 4:20 AM - 14/07/2025
@@ -418,8 +444,8 @@ local function ToggleRangeIndicator()
 
     -- Create new range circles
     range_circles = {
-        CreateRangeIndicator(player, 0, 2.4, {0, 1, 1, 0}),
-        CreateRangeIndicator(player, 0, 1.125, {1, 0, 0, 0}),
+        CreateRangeIndicator(player, 0, ScaleCalculator(MAX_LEAP_DISTANCE), {0, 1, 1, 0}),
+        CreateRangeIndicator(player, 0, ScaleCalculator(GetHealRange()), {1, 0, 0, 0}),
     }
 end
 
