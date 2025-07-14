@@ -423,8 +423,6 @@ local function ScaleCalculator(range)
 end
 
 -- NOTE: MAYBE work on splitting up the range indicators to provide more flexibility in the future BUT for now, this is fine.
--- Also should probably update the labels and hovers in modinfo.lua -- Need to update Leap_To_Mouse_Key and Show_Range_Key.
--- But that is it for today, it is bed time - 4:20 AM - 14/07/2025
 local function ToggleRangeIndicator()
     if not CheckPlayerState() then return end
     DebugLog("Function: ToggleRangeIndicator() called")
