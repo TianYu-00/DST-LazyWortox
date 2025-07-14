@@ -171,11 +171,11 @@ configuration_options = {
     },
     {
         name = "Leap_To_Mouse_Key",
-        label = not isCN and "Leap To Mouse Key" or "跳跃到鼠标键",
+        label = not isCN and "Mouse Leap Key" or "鼠标跳跃键",
         hover = not isCN and 
-                        "Soul‑hop to current mouse position."
+                        "Force hop towards mouse cursor."
                         or 
-                        "在鼠标指针位置进行灵魂跃迁。",
+                        "强制朝鼠标位置跳跃。",
         options = key_options,
         default = "H" -- Temp default
     },
