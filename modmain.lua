@@ -7,7 +7,8 @@ local open_soul_jar_key = GetModConfigData("Open_Soul_Jar_Key") or "C"
 local self_leap_key = GetModConfigData("Self_Leap_Key") or "V"
 local take_soul_from_jar_key = GetModConfigData("Take_Soul_From_Jar_Key") or "B"
 local put_soul_in_jar_key = GetModConfigData("Put_Soul_In_Jar_Key") or "G"
-local leap_to_mouse_key = GetModConfigData("Leap_To_Mouse_Key") or "TAB"
+local leap_to_mouse_key = GetModConfigData("Leap_To_Mouse_Key") or "H"
+local show_range_key = GetModConfigData("Show_Range_Key") or "F7"
 -- Take soul settings
 local amount_of_souls_to_take = GetModConfigData("Amount_Of_Souls_To_Take") or 5
 local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
@@ -24,6 +25,7 @@ local PREFAB_SOUL  = "wortox_soul"
 local PREFAB_JAR   = "wortox_souljar"
 local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40
 local MAX_LEAP_DISTANCE = G.ACTIONS.BLINK.distance or 36
+local range_circles = nil
 
 
 ----------------------------------- Debug Log ----------------------------------- 
@@ -354,6 +356,73 @@ local function LeapToMouse()
     end
 end
 
+----------------------------------- Show Range ----------------------------------- 
+
+local function unpackcolor(c)
+    return c[1], c[2], c[3], c[4] or 0
+end
+
+local function CreateRangeIndicator(inst, rotation, scale, color)
+    local circle = G.CreateEntity()
+    circle.persists = false
+
+    -- Add essential components before accessing them
+    circle.entity:AddTransform()
+    circle.entity:AddAnimState()
+
+    -- Set up transform properties: rotation and scale
+    circle.Transform:SetRotation(rotation)
+    circle.Transform:SetScale(scale, scale, scale)
+
+    -- Set up animation bank/build, then play animation
+    circle.AnimState:SetBank("firefighter_placement")
+    circle.AnimState:SetBuild("firefighter_placement")
+    circle.AnimState:PlayAnimation("idle", true)
+
+    -- Configure animation rendering options
+    circle.AnimState:SetOrientation(G.ANIM_ORIENTATION.OnGround)
+    circle.AnimState:SetLayer(G.LAYER_BACKGROUND)
+    circle.AnimState:SetSortOrder(3)
+    circle.AnimState:SetLightOverride(1)
+    circle.AnimState:SetAddColour(unpackcolor(color))
+
+    -- Add tags to control interaction and game logic
+    circle:AddTag("NOCLICK")
+    circle:AddTag("placer")
+
+    -- Parent to the inst entity for proper positioning
+    circle.entity:SetParent(inst.entity)
+
+    return circle
+end
+
+-- NOTE: MAYBE work on splitting up the range indicators to provide more flexibility in the future BUT for now, this is fine.
+-- Also should probably update the labels and hovers in modinfo.lua -- Need to update Leap_To_Mouse_Key and Show_Range_Key.
+-- But that is it for today, it is bed time - 4:20 AM - 14/07/2025
+local function ToggleRangeIndicator()
+    if not CheckPlayerState() then return end
+    local player = G.ThePlayer
+    if not player then return end
+
+    -- If range circles already exist, remove them and clear the table
+    if range_circles then
+        for _, circle in pairs(range_circles) do
+            if circle and circle:IsValid() then
+                circle:Remove()
+            end
+        end
+        range_circles = nil
+        return
+    end
+
+    -- Create new range circles
+    range_circles = {
+        CreateRangeIndicator(player, 0, 2.4, {0, 1, 1, 0}),
+        CreateRangeIndicator(player, 0, 1.125, {1, 0, 0, 0}),
+    }
+end
+
+
 ----------------------------------- FOR TESTING PURPOSES ONLY ----------------------------------- 
 
 local function Test()
@@ -402,5 +471,13 @@ if leap_to_mouse_key ~= "None" then
     local keycode = G["KEY_" .. leap_to_mouse_key]
     G.TheInput:AddKeyUpHandler(keycode, function()
         LeapToMouse()
+    end)
+end
+
+-- Toggle Leap Range Handler
+if show_range_key ~= "None" then
+    local keycode = G["KEY_" .. show_range_key]
+    G.TheInput:AddKeyUpHandler(keycode, function()
+        ToggleRangeIndicator()
     end)
 end

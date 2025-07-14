@@ -155,6 +155,16 @@ configuration_options = {
         options = key_options,
         default = "H" -- Temp default, remember to change it later !!!
     },
+    {
+        name = "Show_Range_Key",
+        label = not isCN and "Show_Range_Key" or "Show_Range_Key",
+        hover = not isCN and 
+                        ""
+                        or 
+                        "",
+        options = key_options,
+        default = "F7" -- Temp default, remember to change it later !!!
+    },
     AddSection("Souls To Take Settings","取魂设置"),
     {
         name = "Amount_Of_Souls_To_Take",
