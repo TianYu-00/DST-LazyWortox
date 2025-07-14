@@ -7,6 +7,7 @@ local open_soul_jar_key = GetModConfigData("Open_Soul_Jar_Key") or "C"
 local self_leap_key = GetModConfigData("Self_Leap_Key") or "V"
 local take_soul_from_jar_key = GetModConfigData("Take_Soul_From_Jar_Key") or "B"
 local put_soul_in_jar_key = GetModConfigData("Put_Soul_In_Jar_Key") or "G"
+local leap_to_mouse_key = GetModConfigData("Leap_To_Mouse_Key") or "TAB"
 -- Take soul settings
 local amount_of_souls_to_take = GetModConfigData("Amount_Of_Souls_To_Take") or 5
 local take_soul_retries = GetModConfigData("Take_Soul_Retries") or 1
@@ -21,7 +22,8 @@ local debug_mode = GetModConfigData("Debug_Mode") or false
 --
 local PREFAB_SOUL  = "wortox_soul"
 local PREFAB_JAR   = "wortox_souljar"
-local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40 -- Each jar's max soul capacity
+local jar_capacity = G.TUNING.STACK_SIZE_SMALLITEM or 40
+local MAX_LEAP_DISTANCE = G.ACTIONS.BLINK.distance or 36
 
 
 ----------------------------------- Debug Log ----------------------------------- 
@@ -329,7 +331,28 @@ local function PutSoulInJar(total_to_put, on_repeat)
     end)
 end
 
+----------------------------------- Leap To Mouse ----------------------------------- 
 
+local function LeapToMouse()
+    DebugLog("Function: LeapToMouse() called")
+    if not CheckPlayerState() then return end
+    local soul_amount = GetCurrentSoulCount()
+    if soul_amount <= 0 then
+        DebugLog("No souls to leap with.")
+        return
+    end
+
+    local player = G.ThePlayer
+    -- mouse position
+    local mx, _, mz = G.TheInput:GetWorldPosition():Get()
+    -- player position
+    local px, _, pz = player.Transform:GetWorldPosition()
+    -- straight‑line 2‑D distance
+    local dist = math.sqrt((mx - px)^2 + (mz - pz)^2)
+    if dist <= MAX_LEAP_DISTANCE and G.TheWorld.Map:IsPassableAtPoint(mx, 0, mz) then
+        G.SendRPCToServer(G.RPC.LeftClick,G.ACTIONS.BLINK.code,mx, mz)
+    end
+end
 
 ----------------------------------- FOR TESTING PURPOSES ONLY ----------------------------------- 
 
@@ -371,5 +394,13 @@ if put_soul_in_jar_key ~= "None" then
     local keycode = G["KEY_" .. put_soul_in_jar_key]
     G.TheInput:AddKeyUpHandler(keycode, function()
         PutSoulInJar(amount_of_souls_to_store)
+    end)
+end
+
+-- Leap To Mouse Handler
+if leap_to_mouse_key ~= "None" then
+    local keycode = G["KEY_" .. leap_to_mouse_key]
+    G.TheInput:AddKeyUpHandler(keycode, function()
+        LeapToMouse()
     end)
 end
