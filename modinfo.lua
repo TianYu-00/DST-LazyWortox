@@ -33,7 +33,7 @@ or
 所有按键和设置均可在模组选项中自定义。
 ]]
 author = "Tian || TianYu"
-version = "1.1"
+version = "1.1.1"
 forumthread = ""
 
 -- Mod Icon
